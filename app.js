@@ -8,16 +8,17 @@ const LIBRARY = [
   { id: 'quarter',  name: '1 · Quarter notes',        group: 4, steps: 'B---S---B---S---' },
   { id: 'basic',    name: '2 · Basic rock beat',      group: 4, steps: 'B---S---B-B-S---' },
   { id: 'eighths',  name: '3 · Alternating eighths',  group: 4, steps: 'B-S-B-S-B-S-B-S-' },
-  { id: 'funk',     name: '4 · Funk / pop groove',    group: 4, steps: 'B--S-SB--B-SS---' },
+  { id: 'funk',     name: '4 · Funk / pop groove',    group: 4, steps: 'B---S-B--B--S-S-' },
   { id: 'rumba',    name: '5 · Rumba (3-3-2 feel)',   group: 4, steps: 'B--S--B-S-B-S---' },
   { id: 'six8',     name: '6 · 6/8 groove',           group: 3, steps: 'B--S-S' },
   { id: 'buleria',  name: '7 · Bulerías (12 count)',  group: 3, steps: 'B--S--S-S-S-' },
   // Two bars of 2/4 in 16ths: surdo-style bass on each beat with a pickup, slaps fill the gaps.
   { id: 'samba',    name: '8 · Samba',                group: 4, bar: 8, steps: 'B-SBB-SSB-SBB-SS' },
-  // Easier eighth-note versions: 4 beats of 2 steps each.
-  { id: 'samba8',   name: '9 · Samba (8ths)',         group: 2, bar: 4, steps: 'BSBSBSSB' },
+  // Easier version: same two bars of 2/4, thinned to eighths (2 steps per beat), bass kept on every beat.
+  { id: 'samba8',   name: '9 · Samba (8ths)',         group: 2, bar: 4, steps: 'BSBSBSBB' },
   // Bass on every beat, slaps on the bossa nova clave (3·6 | 10·13).
   { id: 'bossa',    name: '10 · Bossa nova',          group: 4, bar: 8, steps: 'B--SB-S-B-S-BS--' },
+  // Same clave written in eighths over two bars of 4/4: same notes, half the speed at a given BPM.
   { id: 'bossa8',   name: '11 · Bossa nova (8ths)',   group: 2, bar: 8, steps: 'B--SB-S-B-S-BS--' },
 ];
 
@@ -155,7 +156,7 @@ const visualQueue = [];
 
 function scheduleStep(step, when) {
   const val = current.steps[step];
-  if (settings.click && step % current.group === 0) playClick(step === 0, when);
+  if (settings.click && step % current.group === 0) playClick(step % (current.bar || current.steps.length) === 0, when);
   if (settings.patSound && val !== '-') playHit(val, when);
   visualQueue.push({ step, val, when });
 }
