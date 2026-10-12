@@ -6,7 +6,7 @@ A mobile-first web page for practicing cajon rhythms. Static files only, no buil
 - Built-in rhythm library shown as a B / S step grid, looping with a metronome and BPM control
 - Edit mode to create your own rhythms; saved on the phone (localStorage)
 - Works offline and can be added to the home screen (PWA)
-- Uses synthesized sounds until you add real samples to `samples/` (see `samples/README.md`)
+- Uses synthesized sounds until you add real samples (`bass.ogg`, `slap.ogg`) to `samples/` (see `samples/README.md`)
 
 ## Publish on GitHub Pages
 

@@ -90,17 +90,25 @@ function synthSlap(c) {
   return buf;
 }
 
-// Real samples: drop bass.wav / slap.wav into /samples and they replace the synth sounds.
+// Real samples: drop bass.ogg / slap.ogg (or .wav / .mp3) into /samples and they replace the synth sounds.
+const SAMPLE_EXTS = ['ogg', 'wav', 'mp3'];
+
+async function loadSample(name) {
+  for (const ext of SAMPLE_EXTS) {
+    try {
+      const res = await fetch(`samples/${name}.${ext}`);
+      if (!res.ok) continue;
+      return await ctx.decodeAudioData(await res.arrayBuffer());
+    } catch (_) { /* try next format */ }
+  }
+  return null;
+}
+
 async function loadSamples() {
   let loaded = 0;
   await Promise.all(['B', 'S'].map(async (k) => {
-    const file = k === 'B' ? 'bass' : 'slap';
-    try {
-      const res = await fetch(`samples/${file}.wav`);
-      if (!res.ok) return;
-      buffers[k] = await ctx.decodeAudioData(await res.arrayBuffer());
-      loaded++;
-    } catch (_) { /* keep synth */ }
+    const buf = await loadSample(k === 'B' ? 'bass' : 'slap');
+    if (buf) { buffers[k] = buf; loaded++; }
   }));
   soundSource = loaded === 2 ? 'samples' : loaded === 1 ? 'mixed' : 'synth';
   updateStatus();
