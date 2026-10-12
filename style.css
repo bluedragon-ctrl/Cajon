@@ -59,6 +59,7 @@ select { flex: 1; min-width: 0; }
 
 /* Step grid */
 .grid { display: grid; gap: 6px; }
+.grid.bars { row-gap: 14px; }
 .cell {
   position: relative; aspect-ratio: 1; border-radius: 10px; border: 2px solid var(--line);
   background: #231913; display: grid; place-items: center; font-weight: 700; font-size: 1.2rem; color: var(--muted);

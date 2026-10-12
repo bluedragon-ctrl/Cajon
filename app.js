@@ -3,6 +3,7 @@
 
 // ---------- Rhythm library ----------
 // B = bass (center), S = slap (top edge), - = rest. `group` = steps per beat.
+// Optional `bar` = steps per bar: each bar gets its own row and beat numbers restart at 1.
 const LIBRARY = [
   { id: 'quarter',  name: '1 · Quarter notes',        group: 4, steps: 'B---S---B---S---' },
   { id: 'basic',    name: '2 · Basic rock beat',      group: 4, steps: 'B---S---B-B-S---' },
@@ -12,9 +13,12 @@ const LIBRARY = [
   { id: 'six8',     name: '6 · 6/8 groove',           group: 3, steps: 'B--S-S' },
   { id: 'buleria',  name: '7 · Bulerías (12 count)',  group: 3, steps: 'B--S--S-S-S-' },
   // Two bars of 2/4 in 16ths: surdo-style bass on each beat with a pickup, slaps fill the gaps.
-  { id: 'samba',    name: '8 · Samba',                group: 4, steps: 'B-SBB-SSB-SBB-SS' },
+  { id: 'samba',    name: '8 · Samba',                group: 4, bar: 8, steps: 'B-SBB-SSB-SBB-SS' },
+  // Easier eighth-note versions: 4 beats of 2 steps each.
+  { id: 'samba8',   name: '9 · Samba (8ths)',         group: 2, bar: 4, steps: 'BSBSBSSB' },
   // Bass on every beat, slaps on the bossa nova clave (3·6 | 10·13).
-  { id: 'bossa',    name: '9 · Bossa nova',           group: 4, steps: 'B--SB-S-B-S-BS--' },
+  { id: 'bossa',    name: '10 · Bossa nova',          group: 4, bar: 8, steps: 'B--SB-S-B-S-BS--' },
+  { id: 'bossa8',   name: '11 · Bossa nova (8ths)',   group: 2, bar: 8, steps: 'B--SB-S-B-S-BS--' },
 ];
 
 const STORE_CUSTOM = 'cajon.custom.v1';
@@ -230,8 +234,9 @@ function columns(n) { return n <= 8 ? n : Math.ceil(n / 2); }
 function renderGrid() {
   const grid = $('grid');
   const n = current.steps.length;
-  grid.style.gridTemplateColumns = `repeat(${columns(n)}, 1fr)`;
+  grid.style.gridTemplateColumns = `repeat(${current.bar || columns(n)}, 1fr)`;
   grid.classList.toggle('editing', editing);
+  grid.classList.toggle('bars', !!current.bar);
   grid.innerHTML = '';
   current.steps.forEach((v, i) => {
     const cell = document.createElement('div');
@@ -240,7 +245,7 @@ function renderGrid() {
     if (i % current.group === 0) {
       const num = document.createElement('span');
       num.className = 'num';
-      num.textContent = i / current.group + 1;
+      num.textContent = (current.bar ? i % current.bar : i) / current.group + 1;
       cell.appendChild(num);
     }
     cell.addEventListener('pointerdown', () => onCellTap(i));
@@ -282,7 +287,7 @@ function findPattern(key) {
   const [kind, id] = key.split(':');
   const list = kind === 'lib' ? LIBRARY : custom;
   const p = list.find((x) => x.id === id);
-  return p ? { key, name: p.name, group: p.group, steps: p.steps.split('') } : null;
+  return p ? { key, name: p.name, group: p.group, bar: p.bar, steps: p.steps.split('') } : null;
 }
 
 function selectPattern(key) {
@@ -307,6 +312,7 @@ function renderStepButtons() {
       const old = current.steps;
       current.steps = Array.from({ length: n }, (_, i) => old[i] || '-');
       current.group = n === 6 || n === 12 ? 3 : 4;
+      delete current.bar;
       renderGrid();
       renderStepButtons();
     });
@@ -327,9 +333,11 @@ function saveCurrent() {
   const name = (prompt('Name for this rhythm:', def) || '').trim();
   if (!name) return;
   const entry = { id: '', name, group: current.group, steps: current.steps.join('') };
+  if (current.bar) entry.bar = current.bar;
   const existing = custom.find((p) => p.name.toLowerCase() === name.toLowerCase());
   if (existing) {
     entry.id = existing.id;
+    delete existing.bar;
     Object.assign(existing, entry);
   } else {
     entry.id = Date.now().toString(36);
