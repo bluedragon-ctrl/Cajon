@@ -2,7 +2,7 @@
 'use strict';
 
 // ---------- Rhythm library ----------
-// B = bass (center), S = slap (top edge), - = rest. `group` = steps per beat.
+// B = bass (center), b = soft bass, S = slap (top edge), - = rest. `group` = steps per beat.
 // Optional `bar` = steps per bar: each bar gets its own row and beat numbers restart at 1.
 const LIBRARY = [
   { id: 'quarter',  name: '1 · Quarter notes',        group: 4, steps: 'B---S---B---S---' },
@@ -12,14 +12,16 @@ const LIBRARY = [
   { id: 'rumba',    name: '5 · Rumba (3-3-2 feel)',   group: 4, steps: 'B--S--B-S-B-S---' },
   { id: 'six8',     name: '6 · 6/8 groove',           group: 3, steps: 'B--S-S' },
   { id: 'buleria',  name: '7 · Bulerías (12 count)',  group: 3, steps: 'B--S--S-S-S-' },
-  // Two bars of 2/4 in 16ths: surdo-style bass on each beat with a pickup, slaps fill the gaps.
-  { id: 'samba',    name: '8 · Samba',                group: 4, bar: 8, steps: 'B-SBB-SSB-SBB-SS' },
+  // Two bars of 2/4 in 16ths: kit-samba bass (1, 1a, 2, 2a), surdo-style soft 1 and strong 2, slaps fill the gaps.
+  { id: 'samba',    name: '8 · Samba',                group: 4, bar: 8, steps: 'b-SBB-SBb-SBB-SB' },
   // Easier version: same two bars of 2/4, thinned to eighths (2 steps per beat), bass kept on every beat.
-  { id: 'samba8',   name: '9 · Samba (8ths)',         group: 2, bar: 4, steps: 'BSBSBSBB' },
-  // Bass on every beat, slaps on the bossa nova clave (3·6 | 10·13).
-  { id: 'bossa',    name: '10 · Bossa nova',          group: 4, bar: 8, steps: 'B--SB-S-B-S-BS--' },
-  // Same clave written in eighths over two bars of 4/4: same notes, half the speed at a given BPM.
-  { id: 'bossa8',   name: '11 · Bossa nova (8ths)',   group: 2, bar: 8, steps: 'B--SB-S-B-S-BS--' },
+  { id: 'samba8',   name: '9 · Samba (8ths)',         group: 2, bar: 4, steps: 'bSBSbSBB' },
+  // Bass on every beat with soft pickups before beats 1 (7·15), slaps on the bossa nova clave (3·6 | 10·13).
+  { id: 'bossa',    name: '10 · Bossa nova',          group: 4, bar: 8, steps: 'B--SB-SbB-S-BS-b' },
+  // Easier version at the same tempo: bass on each beat, one slap on each offbeat.
+  { id: 'bossa8',   name: '11 · Bossa nova (8ths)',   group: 2, bar: 4, steps: 'BSBSBSBS' },
+  // Reversed (2-3) clave: the two bars of the bossa nova swapped (2·5 | 8·11·14).
+  { id: 'bossarev', name: '12 · Bossa nova (reversed)', group: 4, bar: 8, steps: 'B-S-BS-bB--SB-Sb' },
 ];
 
 const STORE_CUSTOM = 'cajon.custom.v1';
@@ -130,9 +132,9 @@ function updateStatus() {
 function playHit(kind, when) {
   const c = getCtx();
   const src = c.createBufferSource();
-  src.buffer = buffers[kind];
+  src.buffer = buffers[kind.toUpperCase()];
   const g = c.createGain();
-  g.gain.value = 1;
+  g.gain.value = kind === 'b' ? 0.4 : 1;
   src.connect(g).connect(c.destination);
   src.start(when || 0);
 }
@@ -224,7 +226,7 @@ function frame() {
       if (nowCell >= 0 && cells[nowCell]) cells[nowCell].classList.remove('now');
       nowCell = ev.step;
       if (cells[ev.step]) cells[ev.step].classList.add('now');
-      if (ev.val !== '-') flash(pads[ev.val], 'cue', 130);
+      if (ev.val !== '-') flash(pads[ev.val.toUpperCase()], 'cue', 130);
     }
   }
   requestAnimationFrame(frame);
@@ -241,7 +243,7 @@ function renderGrid() {
   grid.innerHTML = '';
   current.steps.forEach((v, i) => {
     const cell = document.createElement('div');
-    cell.className = 'cell' + (v !== '-' ? ' ' + v : '') + (i % current.group === 0 ? ' beat' : '');
+    cell.className = 'cell' + (v === 'b' ? ' B soft' : v !== '-' ? ' ' + v : '') + (i % current.group === 0 ? ' beat' : '');
     cell.textContent = v === '-' ? '·' : v;
     if (i % current.group === 0) {
       const num = document.createElement('span');
@@ -254,14 +256,14 @@ function renderGrid() {
   });
   nowCell = -1;
   $('hint').textContent = editing
-    ? 'Tap a step to cycle: rest → B → S. Then Save.'
-    : 'B = bass (center) · S = slap (top edge) · dot = rest';
+    ? 'Tap a step to cycle: rest → B → b → S. Then Save.'
+    : 'B = bass (center) · b = soft bass · S = slap (top edge) · dot = rest';
 }
 
 function onCellTap(i) {
   if (!editing) return;
-  const order = ['-', 'B', 'S'];
-  const next = order[(order.indexOf(current.steps[i]) + 1) % 3];
+  const order = ['-', 'B', 'b', 'S'];
+  const next = order[(order.indexOf(current.steps[i]) + 1) % order.length];
   current.steps[i] = next;
   if (next !== '-') playHit(next);
   renderGrid();
