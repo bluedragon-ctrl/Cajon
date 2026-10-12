@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1b1410">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cajon">
+<title>Cajon Practice</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Cajon Practice</h1>
+  <span id="soundStatus" class="status" title="Where the cajon sounds come from">…</span>
+</header>
+
+<section class="panel">
+  <div class="row">
+    <select id="patternSelect" aria-label="Rhythm"></select>
+    <button id="editBtn" class="btn small" aria-pressed="false">Edit</button>
+  </div>
+
+  <div id="editTools" class="row" hidden>
+    <span class="label">Steps</span>
+    <div id="stepsBtns" class="seg"></div>
+    <button id="saveBtn" class="btn small accent">Save</button>
+    <button id="deleteBtn" class="btn small danger" hidden>Delete</button>
+  </div>
+
+  <div id="grid" class="grid" aria-label="Rhythm pattern"></div>
+  <p id="hint" class="hint"></p>
+</section>
+
+<section class="panel transport">
+  <button id="playBtn" class="play" aria-label="Play / stop">▶</button>
+  <div class="tempo">
+    <div class="row tight">
+      <button id="bpmDown" class="btn round" aria-label="Slower">−</button>
+      <div class="bpmval"><span id="bpmVal">80</span><small>BPM</small></div>
+      <button id="bpmUp" class="btn round" aria-label="Faster">+</button>
+    </div>
+    <input id="bpmRange" type="range" min="40" max="220" step="1" value="80" aria-label="Tempo">
+  </div>
+</section>
+
+<section class="toggles">
+  <label class="toggle"><input type="checkbox" id="clickChk" checked><span>Click</span></label>
+  <label class="toggle"><input type="checkbox" id="soundChk" checked><span>Play pattern</span></label>
+</section>
+
+<section class="pads" aria-label="Cajon pads">
+  <button class="pad slap" data-kind="S"><span>SLAP</span><small>top edge</small></button>
+  <button class="pad bass" data-kind="B"><span>BASS</span><small>center</small></button>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
