@@ -69,6 +69,7 @@ select { flex: 1; min-width: 0; }
 .cell .num { position: absolute; top: 2px; left: 5px; font-size: .62rem; font-weight: 600; color: var(--muted); }
 .cell.B { background: var(--bass); color: #2a1604; border-color: var(--bass); }
 .cell.B.soft { background: transparent; color: var(--bass); }
+.cell.S.soft { background: transparent; color: var(--slap); }
 .cell.S { background: var(--slap); color: #04202c; border-color: var(--slap); }
 .cell.now { outline: 3px solid #fff; outline-offset: 1px; transform: scale(1.07); z-index: 1; }
 .grid.editing .cell { border-style: dashed; cursor: pointer; }
@@ -108,7 +109,12 @@ input[type=range] { width: 100%; height: 32px; accent-color: var(--accent); }
 }
 .pad span { font-size: 1.6rem; font-weight: 800; letter-spacing: .12em; pointer-events: none; }
 .pad small { opacity: .75; pointer-events: none; }
-.pad.slap { flex: 2; background: linear-gradient(160deg, #3c8fb0, #28647c); }
+.pad-row { flex: 2; display: flex; gap: 10px; }
+.pad-row .pad { flex: 2; }
+.pad-row .pad.ghost { flex: 1; }
+.pad.slap { background: linear-gradient(160deg, #3c8fb0, #28647c); }
+.pad.ghost { background: linear-gradient(160deg, #2c5566, #1d3a46); }
+.pad.ghost span { font-size: 1.05rem; letter-spacing: .06em; }
 .pad.bass { flex: 3; background: linear-gradient(160deg, #c6761f, #8a4d10); }
 .pad.hit { transform: scale(.97); filter: brightness(1.45); box-shadow: inset 0 0 0 3px rgba(255,255,255,.4); }
 .pad.cue { box-shadow: inset 0 0 0 6px #fff, 0 4px 0 rgba(0,0,0,.45); }

@@ -2,7 +2,7 @@
 'use strict';
 
 // ---------- Rhythm library ----------
-// B = bass (center), b = soft bass, S = slap (top edge), - = rest. `group` = steps per beat.
+// B = bass (center), b = soft bass, S = slap (top edge), g = ghost note, - = rest. `group` = steps per beat.
 // Optional `bar` = steps per bar: each bar gets its own row and beat numbers restart at 1.
 const LIBRARY = [
   { id: 'quarter',  name: '1 · Quarter notes',        group: 4, steps: 'B---S---B---S---' },
@@ -22,6 +22,8 @@ const LIBRARY = [
   { id: 'bossa8',   name: '11 · Bossa nova (8ths)',   group: 2, bar: 4, steps: 'BSBSBSBS' },
   // Reversed (2-3) clave: the two bars of the bossa nova swapped (2·5 | 8·11·14).
   { id: 'bossarev', name: '12 · Bossa nova (reversed)', group: 4, bar: 8, steps: 'B-S-BS-bB--SB-Sb' },
+  // Basic rock beat with ghost notes on the free offbeats: practise alternating hands.
+  { id: 'rockghost', name: '13 · Rock beat + ghost notes', group: 4, steps: 'B-g-S-g-B-B-S-g-' },
 ];
 
 const STORE_CUSTOM = 'cajon.custom.v1';
@@ -129,12 +131,16 @@ function updateStatus() {
   $('soundStatus').textContent = ctx ? `sounds: ${soundSource}` : 'tap to enable sound';
 }
 
+// Hit kind -> [buffer, volume]. Soft bass and ghost notes reuse the bass / slap sound, quieter.
+const HIT_SOUNDS = { B: ['B', 1], b: ['B', 0.4], S: ['S', 1], g: ['S', 0.25] };
+
 function playHit(kind, when) {
   const c = getCtx();
   const src = c.createBufferSource();
-  src.buffer = buffers[kind.toUpperCase()];
+  const [buf, vol] = HIT_SOUNDS[kind];
+  src.buffer = buffers[buf];
   const g = c.createGain();
-  g.gain.value = kind === 'b' ? 0.4 : 1;
+  g.gain.value = vol;
   src.connect(g).connect(c.destination);
   src.start(when || 0);
 }
@@ -204,7 +210,7 @@ function stop() {
 }
 
 // ---------- Visuals ----------
-const pads = { B: document.querySelector('.pad.bass'), S: document.querySelector('.pad.slap') };
+const pads = { B: document.querySelector('.pad.bass'), S: document.querySelector('.pad.slap'), g: document.querySelector('.pad.ghost') };
 let nowCell = -1;
 
 function clearNow() {
@@ -226,7 +232,7 @@ function frame() {
       if (nowCell >= 0 && cells[nowCell]) cells[nowCell].classList.remove('now');
       nowCell = ev.step;
       if (cells[ev.step]) cells[ev.step].classList.add('now');
-      if (ev.val !== '-') flash(pads[ev.val.toUpperCase()], 'cue', 130);
+      if (ev.val !== '-') flash(pads[ev.val] || pads[ev.val.toUpperCase()], 'cue', 130);
     }
   }
   requestAnimationFrame(frame);
@@ -243,7 +249,7 @@ function renderGrid() {
   grid.innerHTML = '';
   current.steps.forEach((v, i) => {
     const cell = document.createElement('div');
-    cell.className = 'cell' + (v === 'b' ? ' B soft' : v !== '-' ? ' ' + v : '') + (i % current.group === 0 ? ' beat' : '');
+    cell.className = 'cell' + (v === 'b' ? ' B soft' : v === 'g' ? ' S soft' : v !== '-' ? ' ' + v : '') + (i % current.group === 0 ? ' beat' : '');
     cell.textContent = v === '-' ? '·' : v;
     if (i % current.group === 0) {
       const num = document.createElement('span');
@@ -256,13 +262,13 @@ function renderGrid() {
   });
   nowCell = -1;
   $('hint').textContent = editing
-    ? 'Tap a step to cycle: rest → B → b → S. Then Save.'
-    : 'B = bass (center) · b = soft bass · S = slap (top edge) · dot = rest';
+    ? 'Tap a step to cycle: rest → B → b → S → g. Then Save.'
+    : 'B = bass (center) · b = soft bass · S = slap (top edge) · g = ghost · dot = rest';
 }
 
 function onCellTap(i) {
   if (!editing) return;
-  const order = ['-', 'B', 'b', 'S'];
+  const order = ['-', 'B', 'b', 'S', 'g'];
   const next = order[(order.indexOf(current.steps[i]) + 1) % order.length];
   current.steps[i] = next;
   if (next !== '-') playHit(next);

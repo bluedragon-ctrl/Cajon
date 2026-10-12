@@ -1,5 +1,5 @@
 // Stale-while-revalidate cache so the app works offline on the phone.
-const CACHE = 'cajon-v6';
+const CACHE = 'cajon-v8';
 const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png',
   'samples/bass.ogg', 'samples/slap.ogg', 'samples/bass.wav', 'samples/slap.wav'];
 
