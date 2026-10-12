@@ -68,6 +68,7 @@ select { flex: 1; min-width: 0; }
 .cell.beat { border-color: #6b5442; }
 .cell .num { position: absolute; top: 2px; left: 5px; font-size: .62rem; font-weight: 600; color: var(--muted); }
 .cell.B { background: var(--bass); color: #2a1604; border-color: var(--bass); }
+.cell.B.soft { background: transparent; color: var(--bass); }
 .cell.S { background: var(--slap); color: #04202c; border-color: var(--slap); }
 .cell.now { outline: 3px solid #fff; outline-offset: 1px; transform: scale(1.07); z-index: 1; }
 .grid.editing .cell { border-style: dashed; cursor: pointer; }
