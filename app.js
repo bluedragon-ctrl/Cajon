@@ -11,6 +11,10 @@ const LIBRARY = [
   { id: 'rumba',    name: '5 · Rumba (3-3-2 feel)',   group: 4, steps: 'B--S--B-S-B-S---' },
   { id: 'six8',     name: '6 · 6/8 groove',           group: 3, steps: 'B--S-S' },
   { id: 'buleria',  name: '7 · Bulerías (12 count)',  group: 3, steps: 'B--S--S-S-S-' },
+  // Two bars of 2/4 in 16ths: surdo-style bass on each beat with a pickup, slaps fill the gaps.
+  { id: 'samba',    name: '8 · Samba',                group: 4, steps: 'B-SBB-SSB-SBB-SS' },
+  // Bass on every beat, slaps on the bossa nova clave (3·6 | 10·13).
+  { id: 'bossa',    name: '9 · Bossa nova',           group: 4, steps: 'B--SB-S-B-S-BS--' },
 ];
 
 const STORE_CUSTOM = 'cajon.custom.v1';
