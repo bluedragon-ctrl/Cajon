@@ -108,7 +108,12 @@ input[type=range] { width: 100%; height: 32px; accent-color: var(--accent); }
 }
 .pad span { font-size: 1.6rem; font-weight: 800; letter-spacing: .12em; pointer-events: none; }
 .pad small { opacity: .75; pointer-events: none; }
-.pad.slap { flex: 2; background: linear-gradient(160deg, #3c8fb0, #28647c); }
+.pad-row { flex: 2; display: flex; gap: 10px; }
+.pad-row .pad { flex: 2; }
+.pad-row .pad.ghost { flex: 1; }
+.pad.slap { background: linear-gradient(160deg, #3c8fb0, #28647c); }
+.pad.ghost { background: linear-gradient(160deg, #2c5566, #1d3a46); }
+.pad.ghost span { font-size: 1.05rem; letter-spacing: .06em; }
 .pad.bass { flex: 3; background: linear-gradient(160deg, #c6761f, #8a4d10); }
 .pad.hit { transform: scale(.97); filter: brightness(1.45); box-shadow: inset 0 0 0 3px rgba(255,255,255,.4); }
 .pad.cue { box-shadow: inset 0 0 0 6px #fff, 0 4px 0 rgba(0,0,0,.45); }

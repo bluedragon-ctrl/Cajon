@@ -129,12 +129,16 @@ function updateStatus() {
   $('soundStatus').textContent = ctx ? `sounds: ${soundSource}` : 'tap to enable sound';
 }
 
+// Hit kind -> [buffer, volume]. Soft bass and ghost notes reuse the bass / slap sound, quieter.
+const HIT_SOUNDS = { B: ['B', 1], b: ['B', 0.4], S: ['S', 1], g: ['S', 0.25] };
+
 function playHit(kind, when) {
   const c = getCtx();
   const src = c.createBufferSource();
-  src.buffer = buffers[kind.toUpperCase()];
+  const [buf, vol] = HIT_SOUNDS[kind];
+  src.buffer = buffers[buf];
   const g = c.createGain();
-  g.gain.value = kind === 'b' ? 0.4 : 1;
+  g.gain.value = vol;
   src.connect(g).connect(c.destination);
   src.start(when || 0);
 }
@@ -204,7 +208,7 @@ function stop() {
 }
 
 // ---------- Visuals ----------
-const pads = { B: document.querySelector('.pad.bass'), S: document.querySelector('.pad.slap') };
+const pads = { B: document.querySelector('.pad.bass'), S: document.querySelector('.pad.slap'), g: document.querySelector('.pad.ghost') };
 let nowCell = -1;
 
 function clearNow() {
@@ -226,7 +230,7 @@ function frame() {
       if (nowCell >= 0 && cells[nowCell]) cells[nowCell].classList.remove('now');
       nowCell = ev.step;
       if (cells[ev.step]) cells[ev.step].classList.add('now');
-      if (ev.val !== '-') flash(pads[ev.val.toUpperCase()], 'cue', 130);
+      if (ev.val !== '-') flash(pads[ev.val] || pads[ev.val.toUpperCase()], 'cue', 130);
     }
   }
   requestAnimationFrame(frame);
